@@ -7,21 +7,40 @@ const Member = require("../../models/Member");
 
 app.post("/", VerifyMember,async (req, res) => {
   let {author,title,subTitle,banner,content,timeToRead,topic,tags,anonymous} = req.body;
-Topic.create({title:topic}).then((topic)=>{
+  let TopicInDb=await Topic.findOne({title:title})
+
+  if (TopicInDb) {
     Posts.create({
+        author,title,subTitle,banner,content,timeToRead,topic:TopicInDb._id,tags,anonymous
+    })
+    .then(async post=>{
+         await Member.findByIdAndUpdate(author,{$push:{Posts:post._id}})
+         let UpdatedPost = await Posts.findById(post._id).populate(["topic","author"])
+         res.json({success:true,msg:"Post created successfully",payload:UpdatedPost})
+        }).catch(err=>{
+            console.log(err);
+            res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ success: false, msg: "Internal server error" });
+        })
+  }
+  else{
+      Topic.create({title:topic}).then((topic)=>{
+          Posts.create({
         author,title,subTitle,banner,content,timeToRead,topic,tags,anonymous
     })
     .then(async post=>{
          await Member.findByIdAndUpdate(author,{$push:{Posts:post._id}})
-        let UpdatedPost = await Posts.findById(post._id).populate(["topic","author"])
-    res.json({success:true,msg:"Post created successfully",payload:UpdatedPost})
-}).catch(err=>{
-    console.log(err);
-    res
-    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ success: false, msg: "Internal server error" });
-})
-})
+         let UpdatedPost = await Posts.findById(post._id).populate(["topic","author"])
+         res.json({success:true,msg:"Post created successfully",payload:UpdatedPost})
+        }).catch(err=>{
+            console.log(err);
+            res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ success: false, msg: "Internal server error" });
+        })
+    })
+}
 });
 
 app.put("edit/:id",VerifyMember,async(req,res)=>{

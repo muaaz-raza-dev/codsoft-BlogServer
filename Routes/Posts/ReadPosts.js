@@ -65,7 +65,6 @@ app.get("/topic/:topic", async (req, res) => {
    
   
   ]).sort({publishDate:-1,likes:-1})
-  console.log(req.params.topic,payload);
   let TopicInfo =await Topic.findById(req.params.topic)
   let Followers =(await Member.find({interests:req.params.topic})).length;
   res.json({ success: true, payload ,totalResults ,Topic:{_id:TopicInfo?._id,title:TopicInfo?.title,totalPosts:totalResults,Followers} });
@@ -347,7 +346,7 @@ app.post("/starter", async (req, res) => {
       }},
     
     ]).limit(20)
-    let Trendings = await Posts.find({ isDeleted:false,anonymous:false}).sort({publishDate:-1,likes:-1}).populate(["author","topic"]).sort({publishDate:-1,likes:-1}).limit(6)
+    let Trendings = await Posts.find({ isDeleted:false,anonymous:false}).sort({publishDate:-1,likes:-1}).populate(["author","topic"]).sort({likes:-1,publishDate:-1}).limit(6)
       Post=await Posts.aggregate([ 
         {
           $lookup: {
