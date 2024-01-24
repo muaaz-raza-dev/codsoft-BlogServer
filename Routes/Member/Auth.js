@@ -31,7 +31,13 @@ app.post("/register", async (req, res) => {
             avatar,
             interests:Topics
           })
-            .then((user) => {
+            .then(async(user) => {
+              let userInfo=await Member.findById(user._id).populate(["followers",
+              "following",
+              "Posts",
+              "saved",
+              "interests",
+              "liked",])
               let AuthToken = jwt.sign({ id: user._id }, JWT_SECRET);
               res
                 .status(StatusCodes.ACCEPTED)
@@ -39,7 +45,7 @@ app.post("/register", async (req, res) => {
                   success: true,
                   token: AuthToken,
                   msg: "logined successfully",
-                  payload:user
+                  payload:userInfo
                 });
             })
             .catch((err) => {
@@ -71,7 +77,12 @@ app.post("/verify", async (req, res) => {
     if (decodedToken) {
       Member.findById(decodedToken.id)
         .select("-password")
-        .populate([  "Posts","interests","saved"]).select("title")
+        .populate(["followers",
+        "following",
+        "Posts",
+        "saved",
+        "interests",
+        "liked",]).select("title")
         .then((user) => {
           res
             .status(StatusCodes.OK)
@@ -105,7 +116,12 @@ app.post("/verify", async (req, res) => {
 app.post("/login", async (req, res) => {
   let { username, password } = req.body;
   try {
-    let result = await Member.findOne({ username,isDeleted:false });
+    let result = await Member.findOne({ username,isDeleted:false }).populate(["followers",
+    "following",
+    "Posts",
+    "saved",
+    "interests",
+    "liked",]);
     if (!result) {
       res
         .status(StatusCodes.NOT_FOUND)
