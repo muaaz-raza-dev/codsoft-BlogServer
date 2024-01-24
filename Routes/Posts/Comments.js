@@ -5,7 +5,8 @@ const VerifyMember = require("../../middleware/VerifyMember");
 const Comments = require("../../models/Comments");
 const limit = +process.env.DocsPerRequest
 
-app.post("/:id",async(req,res)=>{
+app.post("/read/:id",async(req,res)=>{
+
     let count = +req.header("count")
     try {
     let Payload = await Comments.find({post:req.params.id,Replied:false}).populate("commentor").populate({ 
@@ -18,11 +19,15 @@ app.post("/:id",async(req,res)=>{
     let totalResults = (await Comments.find({post:req.params.id})).length
         res.json({success: true, payload:{ Comment:Payload,count:totalResults>limit*(count==0?count+1:count)?count+1:count,totalResults } ,});
     } catch (error) {
+        console.log(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success: false, msg: "An error occurred"});
     }
 })
+
+
 app.post("/create",VerifyMember,async(req,res)=>{
 let {content,post,replied,Replied}=req.body
+console.log("I am recienving create");
 Comments.create({
     content,commentor:req.AdminId,post ,Replied
 }).then(async comment=>{
