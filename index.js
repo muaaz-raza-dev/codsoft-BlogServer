@@ -10,7 +10,7 @@ const server = require('http').createServer(app)
 app.use(express.json())
 
 app.use(cors({
-  origin:["http://localhost:5173"],
+  origin:["http://localhost:5173","https://codsoft-blog-app.vercel.app"],
   credentials:true,
 }))
 
