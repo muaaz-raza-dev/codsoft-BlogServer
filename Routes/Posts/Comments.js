@@ -27,7 +27,6 @@ app.post("/read/:id",async(req,res)=>{
 
 app.post("/create",VerifyMember,async(req,res)=>{
 let {content,post,replied,Replied}=req.body
-console.log("I am recienving create");
 Comments.create({
     content,commentor:req.AdminId,post ,Replied
 }).then(async comment=>{
