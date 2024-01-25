@@ -80,9 +80,8 @@ app.post("/verify", async (req, res) => {
         .populate(["followers",
         "following",
         "Posts",
-        "saved",
-        "interests",
-        "liked",]).select("title")
+       "interests",
+        "liked",]).populate({path:"saved",populate:{path:"topic"}}).select("title")
         .then((user) => {
           res
             .status(StatusCodes.OK)
