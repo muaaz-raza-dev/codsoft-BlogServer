@@ -7,7 +7,7 @@ app.post("/",VerifyMember, async (req, res) => {
     let {PostId}=req.body
     let type ="save"
     if (req.details.saved.includes(PostId)) {
-        req.details.saved = req.details.saved.filter(elm => elm.toString() !== PostId);
+        req.details.saved = req.details.saved.filter(elm => elm?.toString() != PostId);
         await Member.findByIdAndUpdate(req.AdminId, {saved: req.details.saved});
         type ="unsaved"
     }
