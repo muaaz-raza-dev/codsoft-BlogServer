@@ -7,7 +7,7 @@ const Member = require("../../models/Member");
 
 app.post("/", VerifyMember,async (req, res) => {
   let {author,title,subTitle,banner,content,timeToRead,topic,tags,anonymous} = req.body;
-  let TopicInDb=await Topic.findOne({title:title})
+  let TopicInDb=await Topic.findOne({title:topic})
 
   if (TopicInDb) {
     Posts.create({
@@ -58,8 +58,10 @@ app.put("edit/:id",VerifyMember,async(req,res)=>{
     }
 })
 
-app.delete("delete/:id",VerifyMember,async(req,res)=>{
-  let deletedPost = Posts.findByIdAndUpdate(req.params.id,{isDeleted:true})
-  res.json({success:true,msg:"Post deleted successfuly!"})
+app.delete("/delete/:id",VerifyMember,async(req,res)=>{
+  let deletedPost =await Posts.findByIdAndUpdate(req.params.id,{isDeleted:true})
+  console.log(deletedPost);
+  let allPosts =await Posts.find({author:req.AdminId,isDeleted:false}).populate(["author","topic"])
+  res.json({success:true,msg:"Post deleted successfuly!",payload:allPosts})
 })
 module.exports = app;

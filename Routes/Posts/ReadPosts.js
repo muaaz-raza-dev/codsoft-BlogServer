@@ -14,6 +14,7 @@ app.get("/topic/:topic", async (req, res) => {
     {
       $match: {
         topic:new ObjectId(req.params.topic),
+        isDeleted:false
       },
     },
       {
@@ -121,6 +122,7 @@ TotalResults   = (await Posts.aggregate([
   {
     $match: {
       "topic.title": req.body.topic,
+      isDeleted:false
     },
   },
   {
@@ -150,14 +152,18 @@ TotalResults   = (await Posts.aggregate([
   },
 
 ]).sort({publishDate:-1,likes:-1}).skip(count*limit).limit(limit)
-  console.log(payload);
 
 
   }
   else{
 TotalResults   = await Posts.find({ isDeleted:false,}).count()
 
-   payload=await Posts.aggregate([ 
+   payload=await Posts.aggregate([
+    {
+      $match:{
+        isDeleted:false
+      }
+    }, 
     {
       $lookup: {
         from: "topics",
@@ -251,7 +257,8 @@ try {
   await Posts.aggregate([
   {
     $match: {
-      _id : Post._id
+      _id : Post._id,
+      isDeleted:false
     },
   },
     {
@@ -312,7 +319,6 @@ app.post("/topics",async(req,res)=>{
 
 app.post("/starter", async (req, res) => {
   try {
-    let Post;
     let Topics = await Posts.aggregate([
       {$lookup: {
         from: "topics",
@@ -347,7 +353,8 @@ app.post("/starter", async (req, res) => {
     
     ]).limit(20)
     let Trendings = await Posts.find({ isDeleted:false,anonymous:false}).sort({publishDate:-1,likes:-1}).populate(["author","topic"]).sort({likes:-1,publishDate:-1}).limit(6)
-      Post=await Posts.aggregate([ 
+    let  Post=await Posts.aggregate([ 
+        {$match:{isDeleted:false}},
         {
           $lookup: {
             from: "topics",
@@ -434,7 +441,6 @@ app.post("/starter", async (req, res) => {
    
     res.json({success: true, payload: {Topics, Trendings, Blogs:Post}})
   } catch (error) {
-    console.log(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, msg: 'Internal server error' });
   }
 
