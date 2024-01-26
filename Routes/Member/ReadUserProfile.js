@@ -6,15 +6,11 @@ app.get("/:id",async(req,res)=>{
     let User =await Member.findById(id)
     .populate(["followers",
     "following",
-    "saved",
     "interests",
     "liked",])
-    .populate({
-        path:"Posts",
-        populate:{path:"topic"},
-    })
+   
     .select(["-password","-email","-saved","-registeredDate","-liked","-interests","-Name","-__v"])
-    let Post=await Posts.find({author:id,isDeleted:false,anonymous:false})
+    let Post=await Posts.find({author:id,isDeleted:false,anonymous:false}).populate(["author","topic"]).sort({publishDate:-1})
     res.json({ success: true, payload: { ...User._doc, Posts: Post } });
 })
 

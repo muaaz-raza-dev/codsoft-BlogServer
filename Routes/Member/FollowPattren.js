@@ -15,7 +15,7 @@ app.post("/follow",VerifyMember,async(req,res)=>{
     }
         else{
             await Member.findByIdAndUpdate(toFollow,{$pull: {followers:req.AdminId} })
-            await Member.findByIdAndUpdate(req.AdminId,{$pull: {followings:toFollow} })
+            await Member.findByIdAndUpdate(req.AdminId,{$pull: {following:toFollow} })
             res.json({success:true,paylaod:await Member.findById(req.AdminId),type:"unFollow"})
         }
     } catch (error) {

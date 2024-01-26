@@ -15,6 +15,7 @@ likes:{type:Number,default:0},
 likedDetails:{type:[ObjectId],ref:"Member"},
 comments:{type:[ObjectId],},
 isDeleted:{type:Boolean,default:false},
+FollowerOnly:{type:Boolean,default:false},
 anonymous:{type:Boolean,default:false}
 });
 module.exports = mongoose.model("Posts", Orderschema);

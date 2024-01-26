@@ -319,6 +319,7 @@ app.post("/topics",async(req,res)=>{
 
 app.post("/starter", async (req, res) => {
   try {
+    await Posts.updateMany({FollowerOnly:{$exists:false}},{$set:{FollowerOnly:false}})
     let Topics = await Posts.aggregate([
       {$lookup: {
         from: "topics",
@@ -441,6 +442,7 @@ app.post("/starter", async (req, res) => {
    
     res.json({success: true, payload: {Topics, Trendings, Blogs:Post}})
   } catch (error) {
+    console.log(error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, msg: 'Internal server error' });
   }
 

@@ -82,13 +82,14 @@ app.post("/verify", async (req, res) => {
         "Posts",
        "interests",
         ,]).populate({path:"saved",populate:{path:"topic"}}).select("title")
-        .then((user) => {
+        .then(async(user) => {
+          let AnonymousPost =await Posts.find({anonymous:true,isDeleted:false,author:user._id}).populate(["author","topic"])
           res
             .status(StatusCodes.OK)
             .json({
               success: true,
               msg: "verification completed",
-              payload: user,
+              payload: {...user._doc,anonymous:AnonymousPost},
             });
         })
         .catch((err) =>{

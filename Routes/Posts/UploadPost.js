@@ -6,12 +6,12 @@ const Topic = require("../../models/Topic");
 const Member = require("../../models/Member");
 
 app.post("/", VerifyMember,async (req, res) => {
-  let {author,title,subTitle,banner,content,timeToRead,topic,tags,anonymous} = req.body;
+  let {author,title,subTitle,banner,content,timeToRead,topic,tags,anonymous,FollowerOnly} = req.body;
   let TopicInDb=await Topic.findOne({title:topic})
 
   if (TopicInDb) {
     Posts.create({
-        author,title,subTitle,banner,content,timeToRead,topic:TopicInDb._id,tags,anonymous
+        author,title,subTitle,banner,content,timeToRead,topic:TopicInDb._id,tags,anonymous,FollowerOnly
     })
     .then(async post=>{
          await Member.findByIdAndUpdate(author,{$push:{Posts:post._id}})
